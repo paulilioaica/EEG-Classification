@@ -5,7 +5,6 @@ from torch.utils.data import Dataset
 
 LABELS = ['Valence', 'Arousal', 'Dominance']
 
-
 class DEAP(Dataset):
     def __init__(self, root_dir, label_path):
         self.label_dir = label_path
@@ -25,11 +24,13 @@ class DEAP(Dataset):
         corr_matrix = np.corrcoef(eeg_data[:32, :])
         corr_matrix = np.abs(corr_matrix)
 
-        degree_matrix = corr_matrix.sum(axis=1)
+        adj_matrix = corr_matrix - np.identity(corr_matrix.shape[0])
+        degree_matrix = adj_matrix.sum(axis=1)
+
         diagonal_matrix = np.diag(degree_matrix)
 
         L = diagonal_matrix - corr_matrix
 
         label = np.load(self.labels[item])
 
-        return L, label
+        return np.expand_dims(adj_matrix, axis=0), label[0]/9
