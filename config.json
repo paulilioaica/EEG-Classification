@@ -1,7 +1,7 @@
 {"exp_name": "test",
 
   "path":"./clean_data",
-  "lr" : 0.0001,
+  "lr" : 0.001,
   "train_size": 0.8,
   "dev_size" : 0.2,
   "epochs": 120,

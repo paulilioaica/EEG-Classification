@@ -19,27 +19,25 @@ class Trainer:
         self.network.train()
         running_loss = []
         accuracy = []
-        for idx, (data, label) in enumerate(self.train_dataloader, 0):
+        for idx, data in enumerate(self.train_dataloader):
             self.optimizer.zero_grad()
-            output = self.network(data.to(self.device).float())
-            loss = self.criterion(output.squeeze(), label.to(self.device).float())
-            # predictions = torch.argmax(output, dim=1)
-            rel_error = (abs(output.squeeze().cpu() * 9  - label.cpu() * 9 ) / (output.squeeze().cpu() * 9 )).detach().numpy().mean(axis=0)
-            accuracy.append(rel_error)
+            output = self.network(data.x, data.edge_index, data.batch)  # Perform a single forward pass.
+            loss = self.criterion(output.float(), data.y.float())
             loss.backward()
             self.optimizer.step()
             running_loss.append(loss.item())
-            print("[TRAIN] Epoch {}/{}, Accuracy is {}, Loss is {}".format(epoch, total_epoch, np.mean(accuracy),
-                                                                       np.mean(running_loss)))
+        print("[TRAIN] Epoch {}/{}, Accuracy is {}, Loss is {}".format(epoch, total_epoch, np.mean(accuracy),
+                                                                   np.mean(running_loss)))
         return np.mean(accuracy), np.mean(running_loss)
 
     def eval_net(self):
         running_eval_loss = []
         self.network.eval()
         accuracy = []
-        for idx, (data, label) in enumerate(self.eval_dataloader, 0):
-            output = self.network(data.to(self.device).float())
-            loss = self.criterion(output.squeeze(), label.to(self.device).float())
+        for idx, data in enumerate(self.train_dataloader):
+            self.optimizer.zero_grad()
+            output = self.network(data.x, data.edge_index, data.batch)  # Perform a single forward pass.
+            loss = self.criterion(output.float(), data.y.float())
             # predictions = torch.argmax(output, dim=1)
             # accuracy.append(accuracy_score(label, predictions.cpu()))
             running_eval_loss.append(loss.item())

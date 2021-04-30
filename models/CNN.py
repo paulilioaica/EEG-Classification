@@ -14,7 +14,7 @@ class CNN(nn.Module):
             nn.Conv2d(5, 1, padding=1, kernel_size=3),
             nn.ReLU(),
             nn.MaxPool2d(stride=1, padding=1, kernel_size=3))
-        self.linear = nn.Linear(1024, 1)
+        self.linear = nn.Linear(1024, 4)
 
     def forward(self, x):
         out = self.layer1(x)
